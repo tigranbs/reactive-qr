@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import VideoStream from './video_stream';
+import QRWorker from './qr_decode.worker';
 
 const wrapperStyles = {
   display: 'flex',
@@ -11,7 +12,8 @@ class ReactiveQR extends Component {
   webWorker = null;
 
   componentWillMount() {
-    // TODO: make WebWorker stuff here!
+    this.webWorker = new QRWorker();
+    this.webWorker.addEventListener('message', this.onFrameDecoded);
   }
 
   componentWillUnmount() {
