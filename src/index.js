@@ -1,5 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import LibComponent from "./lib";
+import ReactiveQR from "./lib";
 
-ReactDOM.render(<LibComponent />, document.getElementById("root"));
+const App = () => (
+  <div style={{ width: 300, border: "1px solid #f7f7f7" }}>
+    <ReactiveQR />
+  </div>
+);
+
+ReactDOM.render(<App />, document.getElementById("root"));
