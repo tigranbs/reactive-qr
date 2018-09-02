@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from 'prop-types';
 import VideoStream from './video_stream';
 import QRWorker from './qr_decode.worker';
 
@@ -23,25 +24,66 @@ class ReactiveQR extends Component {
     }
   }
 
-  onFrame = () => {
+  onVideoStreamInit = (state, drawFrame) => {
+    if (this.props.onInit) {
+      this.props.onInit(state);
+    }
+    this.drawVideoFrame = drawFrame;
 
-  };
+    if (this.props.shouldDecode) {
+      this.drawVideoFrame();
+    }
+  }
 
-  onInitCameraStream = () => {
+  onFrame = (frameData) => this.webWorker.postMessage(frameData);
+  drawVideoFrame = () => {}
 
-  };
+  onFrameDecoded = (event) => {
+    const code = event.data;
+    if (code) {
+      const { data } = code;
+      if ( this.props.onCode && data.length > 0 ) {
+        this.props.onCode(code);
+      }
+    }
 
-  onFrameDecoded = () => {
-
+    if (this.props.shouldDecode) {
+      this.drawVideoFrame();
+    }
   };
 
   render() {
     return (
-      <div style={wrapperStyles}>
-        <VideoStream onFrame={this.onFrame} onInit={this.onInitCameraStream} />
+      <div className={this.props.className} style={{...wrapperStyles, ...this.props.style}}>
+        <VideoStream
+          onFrame={this.onFrame}
+          onInit={this.onVideoStreamInit}
+          rearCamera={this.props.rearCamera}
+          style={this.props.videoStyle}
+        />
       </div>
     );
   }
 }
+
+ReactiveQR.propTypes = {
+  onInit: PropTypes.func,
+  shouldDecode: PropTypes.bool,
+  onCode: PropTypes.func,
+  style: PropTypes.object,
+  videoStyle: PropTypes.object,
+  rearCamera: PropTypes.bool,
+  className: PropTypes.string,
+};
+
+ReactiveQR.defaultProps = {
+  onInit: () => {},
+  shouldDecode: true,
+  onCode: () => {},
+  style: {},
+  videoStyle: {},
+  rearCamera: true,
+  className: undefined,
+};
 
 export default ReactiveQR;

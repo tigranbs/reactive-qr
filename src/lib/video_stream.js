@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { isSafari } from './helpers';
 
 const videoStyles = {
@@ -23,10 +24,8 @@ class VideoStream extends Component {
     }
 
     if (typeof this.props.onInit === 'function') {
-      this.props.onInit({ error: initSuccess, message });
+      this.props.onInit({ error: initSuccess, message }, this.drawFrame);
     }
-
-    this.drawFrame();
   }
 
   componentWillUnmount() {
@@ -53,7 +52,9 @@ class VideoStream extends Component {
     const cameras = devices.filter(device => device.kind === 'videoinput');
     let videoMode = { facingMode: 'user' };
     if (cameras.length > 1) {
-      videoMode = isSafari() ? { facingMode: { exact: 'environment' } } : { deviceId: cameras[1].deviceId };
+      const cameraIndex = this.props.rearCamera ? 1 : 0;
+      const cameraEnv = this.props.rearCamera ? 'environment' : 'user';
+      videoMode = isSafari() ? { facingMode: { exact: cameraEnv } } : { deviceId: cameras[cameraIndex].deviceId };
     }
 
     this.stream = await navigator.mediaDevices.getUserMedia({
@@ -93,13 +94,38 @@ class VideoStream extends Component {
     this.video.addEventListener('error', reject, { once: true });
   });
 
-  drawFrame = () => {
+  captureFrame = () => {
+    this.canvasContext.drawImage(this.video, 0, 0, this.streamWidth, this.streamHeight);
+    return this.canvasContext.getImageData(0, 0, this.streamWidth, this.streamHeight);
+  }
 
+  drawFrame = () => {
+    window.requestAnimationFrame(() => {
+      if (!this.canvasContext) return;
+      const { data } = this.captureFrame();
+      this.props.onFrame({
+        data,
+        width: this.streamWidth,
+        height: this.streamHeight,
+      });
+    });
   };
 
   render() {
-    return <video style={videoStyles} ref={v => (this.video = v)} />
+    return <video style={{...videoStyles, ...this.props.style}} ref={v => (this.video = v)} />
   }
+};
+
+VideoStream.propTypes = {
+  onInit: PropTypes.func.isRequired,
+  onFrame: PropTypes.func.isRequired,
+  style: PropTypes.object,
+  rearCamera: PropTypes.bool,
+};
+
+VideoStream.defaultProps = {
+  style: {},
+  rearCamera: true,
 };
 
 export default VideoStream;
