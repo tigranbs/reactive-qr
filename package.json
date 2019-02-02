@@ -1,8 +1,13 @@
 {
   "name": "reactive-qr",
-  "version": "0.0.1",
+  "version": "0.1.4",
   "description": "React component for reading and generating QR codes",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tigranbs/reactive-qr.git"
