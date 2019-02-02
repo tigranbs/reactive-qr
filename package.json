@@ -1,6 +1,6 @@
 {
   "name": "reactive-qr",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "React component for reading and generating QR codes",
   "main": "dist/index.js",
   "files": [
