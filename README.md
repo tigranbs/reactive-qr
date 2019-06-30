@@ -1,5 +1,7 @@
 # Reactive-QR
 
+![Reactive QR Demo](https://i.imgur.com/1N9H687.jpg)
+
 React.js + HTML5 WebWorker QR Code scanner!
 
 There is few other QR code scanner React components out there, but because non of them are using WebWorkers for concurrent image processing, performance is extremely bad on mobile devices,
