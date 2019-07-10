@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
 import VideoStream from './video_stream';
-import QRWorker from './qr_decode.worker';
 
 const wrapperStyles = {
   display: 'flex',
@@ -13,7 +12,7 @@ class ReactiveQR extends Component {
   webWorker = null;
 
   componentWillMount() {
-    this.webWorker = new QRWorker();
+    this.webWorker = new Worker('qr_decode.worker.js');
     this.webWorker.addEventListener('message', this.onFrameDecoded);
   }
 
@@ -36,13 +35,13 @@ class ReactiveQR extends Component {
   }
 
   onFrame = (frameData) => this.webWorker.postMessage(frameData);
-  drawVideoFrame = () => {}
+  drawVideoFrame = () => { }
 
   onFrameDecoded = (event) => {
     const code = event.data;
     if (code) {
       const { data } = code;
-      if ( this.props.onCode && data.length > 0 ) {
+      if (this.props.onCode && data.length > 0) {
         this.props.onCode(code);
       }
     }
@@ -54,7 +53,7 @@ class ReactiveQR extends Component {
 
   render() {
     return (
-      <div className={this.props.className} style={{...wrapperStyles, ...this.props.style}}>
+      <div className={this.props.className} style={{ ...wrapperStyles, ...this.props.style }}>
         <VideoStream
           onFrame={this.onFrame}
           onInit={this.onVideoStreamInit}
@@ -77,9 +76,9 @@ ReactiveQR.propTypes = {
 };
 
 ReactiveQR.defaultProps = {
-  onInit: () => {},
+  onInit: () => { },
   shouldDecode: true,
-  onCode: () => {},
+  onCode: () => { },
   style: {},
   videoStyle: {},
   rearCamera: true,
